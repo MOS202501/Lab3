@@ -115,6 +115,7 @@ plt.ylabel("y")
 plt.title("Trayectorias del Gradiente Descendente para Diferentes α")
 plt.legend()
 plt.grid()
+plt.savefig('plots/trayectorias_problema4.png')
 plt.show()
 plt.close()
 
@@ -242,8 +243,6 @@ def newton_raphson(initial_point, alpha, tol=1e-6, max_iter=1000):
 # Parámetros iniciales
 x0 = [-2, -3]
 
-
-
 alpha_values = [0.1, 0.2,0.3,0.4, 0.5,0.6, 0.7, 0.8, 0.9, 1.0]  # Diferentes tasas de aprendizaje
 results2 = {}
 results3 = {}
@@ -263,96 +262,53 @@ for alpha in alpha_values:
 
 print("En este caso, no hay un valor optimo. Dependiendo del algoritmo que usemos y el alpha, va a cambiar nuestro resultado."
 "Esto se debe a que nuestra funcion presenta un punto de silla. Además, en descenso del gradiente para alphas mayores a 0.1, el gradiente"
-"es demasiado grande y en cada iteración sigue creciendo, no convergiendo a nada. ")
+" es demasiado grande y en cada iteración sigue creciendo, no convergiendo a nada. ")
 
-"""# Crear una malla para graficar los contornos
+x0 = [-2, -3]
+alpha_gd = 0.1
+alpha_nr = 1.0
+
+_, path_gd, _ = gradient_descent(x0, alpha=alpha_gd)
+_, path_nr, _ = newton_raphson(x0, alpha=alpha_nr)
+
+path_nr = np.array(path_nr)  # Convertir la lista en un array de NumPy
+path_gd = np.array(path_gd)
+
+# Crear malla para graficar
 x = np.linspace(-4, 4, 100)
 y = np.linspace(-4, 4, 100)
 X, Y = np.meshgrid(x, y)
-Z = f_xy(X, Y)  # Evaluar la función
+Z = f_xy(X, Y)
 
-# Crear la figura
-plt.figure(figsize=(8, 6))
+# Figura 3D con trayectorias
+fig = plt.figure(figsize=(10, 5))
+ax = fig.add_subplot(121, projection='3d')
+ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.6)
+ax.plot(path_gd[:, 0], path_gd[:, 1], f_xy(path_gd[:, 0], path_gd[:, 1]), 'ro-', label='Gradiente Descendente')
+ax.plot(path_nr[:, 0], path_nr[:, 1], f_xy(path_nr[:, 0], path_nr[:, 1]), 'bo-', label='Newton-Raphson')
+ax.scatter(x0[0], x0[1], f_xy(x0[0], x0[1]), color='black', marker='s', s=100, label='Inicio')
+ax.scatter(path_gd[-1, 0], path_gd[-1, 1], f_xy(path_gd[-1, 0], path_gd[-1, 1]), color='yellow', marker='*', s=150, label='Final GD')
+ax.scatter(path_nr[-1, 0], path_nr[-1, 1], f_xy(path_nr[-1, 0], path_nr[-1, 1]), color='green', marker='*', s=150, label='Final NR')
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("F(X, Y)")
+ax.set_title("Superficie y Trayectorias de Optimización")
+ax.legend()
 
-# Graficar contornos
-plt.contour(X, Y, Z, levels=20, cmap="viridis")
-
-# Graficar trayectorias
-for alpha in alpha_values:
-    # Extraer trayectorias
-    path_gd = np.array(results2[alpha][1])  # Gradiente Descendente
-    path_nr = np.array(results3[alpha][1])  # Newton-Raphson
-    
-    plt.plot(path_gd[:, 0], path_gd[:, 1], "ro-", label="Gradiente Descendente" if alpha == alpha_values[0] else "")
-    plt.plot(path_nr[:, 0], path_nr[:, 1], "bo-", label="Newton-Raphson" if alpha == alpha_values[0] else "")
-
-# Punto inicial y puntos finales
-plt.scatter(x0[0], x0[1], color="black", marker="s", label="Punto inicial", s=100)
-plt.scatter(path_gd[-1, 0], path_gd[-1, 1], color="yellow", marker="*", label="Solución GD", s=150)
-plt.scatter(path_nr[-1, 0], path_nr[-1, 1], color="green", marker="*", label="Solución NR", s=150)
-
-# Configuración de ejes y leyenda
-plt.xlabel("X")
-plt.ylabel("Y")
-plt.legend()
-plt.title("Trayectorias de Gradiente Descendente y Newton-Raphson")
-plt.grid()
-plt.show()
-
-"""
-# Crear una malla para graficar los contornos
-x = np.linspace(-4, 4, 100)
-y = np.linspace(-4, 4, 100)
-X, Y = np.meshgrid(x, y)
-Z = f_xy(X, Y)  # Evaluar la función
-
-# Crear la figura con 2 subgráficos
-fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-
-
-axes[0].contour(X, Y, Z, levels=20, cmap="viridis")  # Mapa de contorno
-
-for alpha in alpha_values:
-    path_gd = np.array(results2[alpha][1])  # Trayectoria Gradiente Descendente
-    path_nr = np.array(results3[alpha][1])  # Trayectoria Newton-Raphson
-
-    # Graficar trayectorias
-    axes[0].plot(path_gd[:, 0], path_gd[:, 1], "ro-", label="Gradiente Descendente" if alpha == alpha_values[0] else "")
-    axes[0].plot(path_nr[:, 0], path_nr[:, 1], "bo-", label="Newton-Raphson" if alpha == alpha_values[0] else "")
-
-# Punto inicial y puntos finales
-axes[0].scatter(x0[0], x0[1], color="black", marker="s", label="Punto inicial", s=100)
-axes[0].scatter(path_gd[-1, 0], path_gd[-1, 1], color="red", marker="*", label="Solución GD", s=150)
-axes[0].scatter(path_nr[-1, 0], path_nr[-1, 1], color="blue", marker="*", label="Solución NR", s=150)
-
-# Configuración de ejes y leyenda
-axes[0].set_xlabel("X")
-axes[0].set_ylabel("Y")
-axes[0].legend()
-axes[0].set_title("Trayectorias de Gradiente Descendente y Newton-Raphson")
-axes[0].grid()
-
-optimum = path_nr[-1]  # Tomamos el último punto de Newton-Raphson como referencia
-
-for alpha in alpha_values:
-    path_gd = np.array(results2[alpha][1])
-    path_nr = np.array(results3[alpha][1])
-    
-    # Calcular la distancia al óptimo en cada iteración
-    error_gd = np.linalg.norm(path_gd - optimum, axis=1)
-    error_nr = np.linalg.norm(path_nr - optimum, axis=1)
-
-    # Graficar errores en escala logarítmica
-    axes[1].plot(range(len(error_gd)), error_gd, "r-", label="Gradiente Descendente" if alpha == alpha_values[0] else "")
-    axes[1].plot(range(len(error_nr)), error_nr, "b-", label="Newton-Raphson" if alpha == alpha_values[0] else "")
-
-axes[1].set_yscale("log")  # Escala logarítmica para mostrar la convergencia
-axes[1].set_xlabel("Iteraciones")
-axes[1].set_ylabel("Error (distancia al óptimo)")
-axes[1].legend()
-axes[1].set_title("Convergencia del error en escala logarítmica")
-axes[1].grid()
-
-# Mostrar ambas gráficas en la misma figura
+# Convergencia del error en escala logarítmica
+ax2 = fig.add_subplot(122)
+optimum = path_nr[-1]
+error_gd = np.linalg.norm(path_gd - optimum, axis=1)
+error_nr = np.linalg.norm(path_nr - optimum, axis=1)
+ax2.plot(range(len(error_gd)), error_gd, 'r-', label='Gradiente Descendente')
+ax2.plot(range(len(error_nr)), error_nr, 'b-', label='Newton-Raphson')
+ax2.set_yscale("log")
+ax2.set_xlabel("Iteraciones")
+ax2.set_ylabel("Error (distancia al óptimo)")
+ax2.set_title("Convergencia del Error")
+ax2.legend()
+ax2.grid()
 plt.tight_layout()
+plt.savefig('plots/convergencia_problema_4.png')
 plt.show()
+
